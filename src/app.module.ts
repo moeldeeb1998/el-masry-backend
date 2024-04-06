@@ -6,6 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import { validate } from './env.validate';
 import { LoggerModule } from './logger/logger.module';
 import { LoggerService } from './logger/logger.service';
+import { UserModule } from './user/user.module';
+import { User } from './user/user.model';
 
 @Module({
   imports: [
@@ -22,9 +24,13 @@ import { LoggerService } from './logger/logger.service';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      models: [],
+      dialectOptions: {
+        useUtC: true, // for reading from database
+      },
+      models: [User],
     }),
     LoggerModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService, LoggerService],
