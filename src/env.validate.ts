@@ -1,7 +1,7 @@
 import { plainToInstance } from 'class-transformer';
 import { IsNumber, IsString, validateSync } from 'class-validator';
 
-class EnvironmentVariables {
+export class EnvironmentVariables {
   @IsString()
   APP_HOST: string;
 

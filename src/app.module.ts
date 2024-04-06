@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ConfigModule } from '@nestjs/config';
 import { validate } from './env.validate';
+import { LoggerModule } from './logger/logger.module';
+import { LoggerService } from './logger/logger.service';
 
 @Module({
   imports: [
@@ -22,8 +24,9 @@ import { validate } from './env.validate';
       database: process.env.DATABASE_NAME,
       models: [],
     }),
+    LoggerModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, LoggerService],
 })
 export class AppModule {}
