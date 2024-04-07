@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -8,6 +8,8 @@ import { UserModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { env, validate } from './configs/env';
+import { entities } from './configs/entities.typeorm';
+import { LoggerMiddleware } from './middlewares/logger.middleware';
 
 @Module({
   imports: [
@@ -26,12 +28,20 @@ import { env, validate } from './configs/env';
       username: env.DATABASE.USERNAME,
       password: env.DATABASE.PASSWORD,
       database: env.DATABASE.NAME,
+      entities,
     }),
     UserModule,
   ],
   controllers: [AppController],
   providers: [AppService, LoggerService],
 })
-export class AppModule {
-  constructor(private dataSource: DataSource) {}
+export class AppModule implements NestModule {
+  constructor(private dataSource: DataSource) {
+    if (env.APP.ENV == 'PROD') {
+      this.dataSource.runMigrations();
+    }
+  }
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('');
+  }
 }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -10,6 +11,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { validateUUID } from '../utils/validator';
 
 @Controller('/api/users')
 export class UsersController {
@@ -22,6 +24,10 @@ export class UsersController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
+    const uuidValidation = validateUUID(id);
+    if (!uuidValidation.status)
+      throw new BadRequestException(uuidValidation.message);
+
     return this.usersService.findOne(id);
   }
 
