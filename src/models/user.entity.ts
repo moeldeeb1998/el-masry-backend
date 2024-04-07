@@ -1,6 +1,6 @@
 import { Entity, Column, Index } from 'typeorm';
 import BaseEntity from './base.entity';
-import RoleNames from '../enums/RoleNames';
+import RoleNames from './enums/RoleNames';
 
 @Entity('users')
 export class User extends BaseEntity {
