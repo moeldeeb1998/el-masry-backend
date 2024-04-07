@@ -11,7 +11,7 @@ export class LoggerService {
     logger.info(message, { context });
   }
 
-  error(message: string, trace: string, context?: string) {
+  error(message: string, trace?: string, context?: string) {
     logger.error(message, { context, trace });
   }
 

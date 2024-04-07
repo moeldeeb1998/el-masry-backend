@@ -1,38 +1,37 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SequelizeModule } from '@nestjs/sequelize';
 import { ConfigModule } from '@nestjs/config';
-import { validate } from './env.validate';
 import { LoggerModule } from './logger/logger.module';
 import { LoggerService } from './logger/logger.service';
-import { UserModule } from './user/user.module';
-import { User } from './user/user.model';
+import { UserModule } from './users/user.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { env, validate } from './configs/env';
 
 @Module({
   imports: [
+    // configure logger
+    LoggerModule,
     // load and validate .env file
     ConfigModule.forRoot({
-      validate,
       isGlobal: true,
+      validate,
     }),
     // connect to DB
-    SequelizeModule.forRoot({
-      dialect: 'postgres',
-      host: process.env.DATABASE_HOST,
-      port: parseInt(process.env.DATABASE_PORT || '5432'),
-      username: process.env.DATABASE_USERNAME,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_NAME,
-      dialectOptions: {
-        useUtC: true, // for reading from database
-      },
-      models: [User],
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: env.DATABASE.HOST,
+      port: env.DATABASE.PORT,
+      username: env.DATABASE.USERNAME,
+      password: env.DATABASE.PASSWORD,
+      database: env.DATABASE.NAME,
     }),
-    LoggerModule,
     UserModule,
   ],
   controllers: [AppController],
   providers: [AppService, LoggerService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private dataSource: DataSource) {}
+}
