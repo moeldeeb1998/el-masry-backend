@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { User } from '../models/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { hash } from '../utils/encrypt';
 
 @Injectable()
 export class UsersService {
@@ -19,8 +20,9 @@ export class UsersService {
     return this.userRepository.findOneBy({ id });
   }
 
-  create(createUserDto: CreateUserDto) {
-    return `this action adds a new user ${JSON.stringify(createUserDto)}`;
+  async create(createUserDto: CreateUserDto) {
+    createUserDto.password = await hash(createUserDto.password);
+    return this.userRepository.save(createUserDto);
   }
 
   update(id: string, updatedUserDto: UpdateUserDto) {
