@@ -12,6 +12,8 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { validateUUID } from '../utils/validator';
+import { UserResource } from './resource/user.resource';
+import { User } from '../models/user.entity';
 
 @Controller('/api/users')
 export class UsersController {
@@ -32,8 +34,9 @@ export class UsersController {
   }
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    const createdUser: User = await this.usersService.create(createUserDto);
+    return new UserResource().fromUser(createdUser);
   }
 
   @Patch(':id')
