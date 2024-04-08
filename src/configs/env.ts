@@ -23,6 +23,9 @@ export const env = {
     EMAIL: process.env.ADMIN_EMAIL,
     PASSWORD: process.env.ADMIN_PASSWORD,
   },
+  SECRETS: {
+    JWT: process.env.SECRETS_JWT,
+  },
 };
 
 export const configSchema = Joi.object({
@@ -43,6 +46,9 @@ export const configSchema = Joi.object({
     LASTNAME: Joi.string().required(),
     EMAIL: Joi.string().required(),
     PASSWORD: Joi.string().required(),
+  }),
+  SECRETS: Joi.object({
+    JWT: Joi.string().required(),
   }),
 });
 

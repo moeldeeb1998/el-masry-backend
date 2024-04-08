@@ -10,6 +10,7 @@ import { DataSource } from 'typeorm';
 import { env, validate } from './configs/env';
 import { entities } from './configs/entities.typeorm';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { LoggerMiddleware } from './middlewares/logger.middleware';
       entities,
     }),
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, LoggerService],

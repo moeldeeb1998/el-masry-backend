@@ -10,6 +10,6 @@ import { LoggerModule } from '../logger/logger.module';
   imports: [LoggerModule, TypeOrmModule.forFeature([User])],
   controllers: [UsersController],
   providers: [UsersService, User, AdminSeeder],
-  exports: [TypeOrmModule, AdminSeeder],
+  exports: [TypeOrmModule, AdminSeeder, UsersService],
 })
 export class UsersModule {}
