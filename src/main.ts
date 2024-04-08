@@ -2,12 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { LoggerService } from './logger/logger.service';
 import { ValidationPipe } from '@nestjs/common';
+import { env } from './configs/env';
 
-const customeLogger = new LoggerService();
+const logger = new LoggerService();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: customeLogger,
+    logger: logger,
   });
   app.useGlobalPipes(
     // validate DTOs
@@ -15,10 +16,8 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
-  await app.listen(process.env.APP_PORT || 3000, () => {
-    customeLogger.info(
-      `App started at ${process.env.APP_HOST}:${process.env.APP_PORT}`,
-    );
+  await app.listen(env.APP.PORT, () => {
+    logger.info(`App started at http://localhost:${env.APP.PORT}`);
   });
 }
 bootstrap();

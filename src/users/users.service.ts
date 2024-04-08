@@ -5,6 +5,7 @@ import { QueryFailedError, Repository } from 'typeorm';
 import { User } from '../models/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from '../utils/encrypt';
+import RoleNames from '../models/enums/RoleNames';
 
 @Injectable()
 export class UsersService {
@@ -20,10 +21,11 @@ export class UsersService {
     return this.userRepository.findOneBy({ id });
   }
 
-  async create(createUserDto: CreateUserDto) {
+  private async create(dto: Partial<User>) {
     try {
-      createUserDto.password = await hash(createUserDto.password);
-      const createdUser = await this.userRepository.save(createUserDto);
+      const newUser: Partial<User> = dto;
+      newUser.password = await hash(dto.password as string);
+      const createdUser = await this.userRepository.save(newUser);
       return createdUser;
     } catch (error) {
       if (
@@ -37,11 +39,26 @@ export class UsersService {
     }
   }
 
+  async createAdmin(dto: CreateUserDto) {
+    const adminData: Partial<User> = { ...dto, role: RoleNames.ADMIN };
+    return await this.create(adminData);
+  }
+
   update(id: string, updatedUserDto: UpdateUserDto) {
     return `This action update a #${id} with the following data ${JSON.stringify(updatedUserDto)}`;
   }
 
   remove(id: string) {
     return this.userRepository.delete(id);
+  }
+
+  async countAdmins() {
+    return await this.userRepository.countBy({
+      role: RoleNames.ADMIN,
+    });
+  }
+
+  async countAll() {
+    return await this.userRepository.count();
   }
 }

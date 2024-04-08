@@ -35,7 +35,8 @@ export class UsersController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    const createdUser: User = await this.usersService.create(createUserDto);
+    const createdUser: User =
+      await this.usersService.createAdmin(createUserDto);
     return new UserResource().fromUser(createdUser);
   }
 
