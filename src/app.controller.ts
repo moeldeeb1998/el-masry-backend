@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { LoggerService } from './logger/logger.service';
+import { SkipAuth } from './decorators/auth.decorator';
 
 @Controller()
 export class AppController {
@@ -9,6 +10,7 @@ export class AppController {
     private readonly logger: LoggerService,
   ) {}
 
+  @SkipAuth()
   @Get('/health')
   healthCheck(): string {
     this.logger.log('checking health');

@@ -25,6 +25,7 @@ export const env = {
   },
   SECRETS: {
     JWT: process.env.SECRETS_JWT,
+    JWT_EXPIRY: Number(process.env.SECRETS_JWT_EXPIRY) ?? 60,
   },
 };
 
@@ -49,6 +50,7 @@ export const configSchema = Joi.object({
   }),
   SECRETS: Joi.object({
     JWT: Joi.string().required(),
+    JWT_EXPIRY: Joi.number().required(),
   }),
 });
 
