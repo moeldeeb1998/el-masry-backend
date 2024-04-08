@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { User } from '../models/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from '../utils/encrypt';
@@ -21,8 +21,20 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    createUserDto.password = await hash(createUserDto.password);
-    return this.userRepository.save(createUserDto);
+    try {
+      createUserDto.password = await hash(createUserDto.password);
+      const createdUser = await this.userRepository.save(createUserDto);
+      return createdUser;
+    } catch (error) {
+      if (
+        error instanceof QueryFailedError &&
+        error.message.includes('duplicate key value violates unique constraint')
+      ) {
+        throw new UnprocessableEntityException('Email already exists');
+      } else {
+        throw error;
+      }
+    }
   }
 
   update(id: string, updatedUserDto: UpdateUserDto) {
