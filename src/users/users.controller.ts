@@ -4,9 +4,11 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
+  Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -14,39 +16,64 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { validateUUID } from '../utils/validator';
 import { UserResource } from './resource/user.resource';
 import { User } from '../models/user.entity';
+import { Response } from 'express';
 
-@Controller('/api/users')
+@Controller('api')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @Get('admins')
+  async findAllAdmins() {
+    const admins = await this.usersService.findAllAdmins();
+    return admins.map((admin) => {
+      return UserResource.fromUser(admin);
+    });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get('admins/:id')
+  async findAdmin(@Param('id') id: string) {
     const uuidValidation = validateUUID(id);
     if (!uuidValidation.status)
       throw new BadRequestException(uuidValidation.message);
 
-    return this.usersService.findOne(id);
+    const admin = await this.usersService.findAdmin(id);
+
+    if (!admin) throw new NotFoundException(`User not found`);
+
+    return UserResource.fromUser(admin);
   }
 
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
+  @Post('admins')
+  async createAdmin(@Body() createUserDto: CreateUserDto) {
     const createdUser: User =
       await this.usersService.createAdmin(createUserDto);
-    return new UserResource().fromUser(createdUser);
+
+    return UserResource.fromUser(createdUser);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  @Patch('admins/:id')
+  async updateAdmin(
+    @Res() res: Response,
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const uuidValidation = validateUUID(id);
+    if (!uuidValidation.status)
+      throw new BadRequestException(uuidValidation.message);
+    await this.usersService.updateAdmin(id, updateUserDto);
+
+    // return No Content
+    return res.status(204).end();
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  @Delete('admins/:id')
+  async removeAdmin(@Res() res: Response, @Param('id') id: string) {
+    const uuidValidation = validateUUID(id);
+    if (!uuidValidation.status)
+      throw new BadRequestException(uuidValidation.message);
+
+    await this.usersService.removeAdmin(id);
+    // return No Content
+    return res.status(204).end();
   }
 }

@@ -1,7 +1,19 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { QueryFailedError, Repository } from 'typeorm';
+import {
+  FindManyOptions,
+  FindOptionsWhere,
+  ObjectId,
+  QueryFailedError,
+  Repository,
+  SaveOptions,
+} from 'typeorm';
 import { User } from '../models/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from '../utils/encrypt';
@@ -13,12 +25,13 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  findAll() {
-    return this.userRepository.find();
+  // TypeORM methos
+  async findAll(options?: FindManyOptions<User>) {
+    return await this.userRepository.find(options);
   }
 
-  findOne(id: string) {
-    return this.userRepository.findOneBy({ id });
+  async findOneBy(where: FindOptionsWhere<User> | FindOptionsWhere<User>[]) {
+    return await this.userRepository.findOneBy(where);
   }
 
   private async create(dto: Partial<User>) {
@@ -39,25 +52,73 @@ export class UsersService {
     }
   }
 
-  async createAdmin(dto: CreateUserDto) {
-    const adminData: Partial<User> = { ...dto, role: RoleNames.ADMIN };
-    return await this.create(adminData);
+  private async update(
+    entity: Partial<User>,
+    options?: SaveOptions | undefined,
+  ) {
+    return await this.userRepository.save(entity, options);
   }
 
-  update(id: string, updatedUserDto: UpdateUserDto) {
-    return `This action update a #${id} with the following data ${JSON.stringify(updatedUserDto)}`;
+  private async delete(
+    criteria:
+      | string
+      | number
+      | FindOptionsWhere<User>
+      | Date
+      | ObjectId
+      | string[]
+      | number[]
+      | Date[]
+      | ObjectId[],
+  ) {
+    return await this.userRepository.delete(criteria);
   }
 
-  remove(id: string) {
-    return this.userRepository.delete(id);
-  }
-
+  // Custom Methos For Admin Role
   async countAdmins() {
     return await this.userRepository.countBy({
       role: RoleNames.ADMIN,
     });
   }
 
+  async findAllAdmins() {
+    return await this.findAll({ where: { role: RoleNames.ADMIN } });
+  }
+
+  async findAdmin(id: string) {
+    return await this.findOneBy({ id, role: RoleNames.ADMIN });
+  }
+
+  async createAdmin(dto: CreateUserDto) {
+    const adminData: Partial<User> = { ...dto, role: RoleNames.ADMIN };
+    return await this.create(adminData);
+  }
+
+  async updateAdmin(id: string, updatedUserDto: UpdateUserDto) {
+    const user: Partial<User> = updatedUserDto;
+    user.id = id;
+
+    const oldUserData = await this.findOneBy({ id, role: RoleNames.ADMIN });
+
+    if (!oldUserData) throw new NotFoundException('Admin Not Found');
+
+    return await this.update(user);
+  }
+
+  async removeAdmin(id: string) {
+    const admin = await this.findAdmin(id);
+    if (!admin) throw new NotFoundException('Admin Not Found');
+
+    const adminCounter = await this.countAdmins();
+
+    if (adminCounter > 1) {
+      return await this.delete(id);
+    }
+
+    throw new ForbiddenException('System Must Has At Least One Admin');
+  }
+
+  // Custom Methods For All Users
   async countAll() {
     return await this.userRepository.count();
   }

@@ -5,7 +5,6 @@ export const validateUUID = (id: string) => {
   const isValidUUID = uuidPattern.test(id);
 
   if (isValidUUID) {
-    console.log('Valid UUID');
     return {
       status: true,
       message: '',
