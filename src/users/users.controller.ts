@@ -91,4 +91,29 @@ export class UsersController {
     // return No Content
     return res.status(204).end();
   }
+
+  @Roles(RoleNames.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get('users')
+  async findAllUsers() {
+    const users = await this.usersService.findAllUsers();
+    return users.map((user) => {
+      return UserResource.fromUser(user);
+    });
+  }
+
+  @Roles(RoleNames.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get('users/:id')
+  async findUser(@Param('id') id: string) {
+    const uuidValidation = validateUUID(id);
+    if (!uuidValidation.status)
+      throw new BadRequestException(uuidValidation.message);
+
+    const user = await this.usersService.findUser(id);
+
+    if (!user) throw new NotFoundException(`User not found`);
+
+    return UserResource.fromUser(user);
+  }
 }

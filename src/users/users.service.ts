@@ -124,11 +124,18 @@ export class UsersService {
     return await this.create(userData);
   }
 
+  async findAllUsers() {
+    return await this.findAll({ where: { role: RoleNames.USER } });
+  }
+
+  async findUser(id: string) {
+    return await this.findOneBy({ id, role: RoleNames.USER });
+  }
+
   // Custom Methods For All Users
   async countAll() {
     return await this.userRepository.count();
   }
-
   async updateRefreshToken(email: string, refreshToken: string | null) {
     const user = await this.findOneBy({ email });
     if (!user) throw new Error('User Not found');
