@@ -11,6 +11,7 @@ import { env, validate } from './configs/env';
 import { entities } from './configs/entities.typeorm';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { AuthModule } from './auth/auth.module';
+import { TestsModule } from './tests/tests.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     AuthModule,
+    TestsModule,
   ],
   controllers: [AppController],
   providers: [AppService, LoggerService],
