@@ -118,8 +118,21 @@ export class UsersService {
     throw new ForbiddenException('System Must Has At Least One Admin');
   }
 
+  // Custom Methos For User Role
+  async createUser(dto: CreateUserDto) {
+    const userData: Partial<User> = { ...dto, role: RoleNames.USER };
+    return await this.create(userData);
+  }
+
   // Custom Methods For All Users
   async countAll() {
     return await this.userRepository.count();
+  }
+
+  async updateRefreshToken(email: string, refreshToken: string | null) {
+    const user = await this.findOneBy({ email });
+    if (!user) throw new Error('User Not found');
+    user.refreshToken = refreshToken !== null ? refreshToken : '';
+    return await this.update(user);
   }
 }

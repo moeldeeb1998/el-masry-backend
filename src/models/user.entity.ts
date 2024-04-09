@@ -45,4 +45,9 @@ export class User extends BaseEntity {
     nullable: true,
   })
   profileId: string;
+
+  @Column({
+    nullable: true,
+  })
+  refreshToken: string;
 }

@@ -6,13 +6,14 @@ import {
 } from '@nestjs/common';
 import { CustomRequest } from '../types/custom-request';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
-import { env } from '../configs/env';
-import { JWTPayload } from './dto/jwt-payload.dto';
+// import { env } from '../configs/env';
+// import { JWTPayload } from './dto/jwt-payload.dto';
 import { UsersService } from '../users/users.service';
-import { User } from '../models/user.entity';
+// import { User } from '../models/user.entity';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/auth.decorator';
 
+// this is not_used now
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
@@ -40,15 +41,15 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const payload: JWTPayload = await this.jwtService.verifyAsync(token, {
-        secret: env.SECRETS.JWT,
-      });
-      const loggedInUser = (await this.usersService.findOneBy({
-        email: payload.email,
-        role: payload.role,
-      })) as User;
+      // const payload: JWTPayload = await this.jwtService.verifyAsync(token, {
+      //   secret: env.SECRETS.JWT_ACCESS_SECRET,
+      // });
+      // const loggedInUser = (await this.usersService.findOneBy({
+      //   email: payload.email,
+      //   role: payload.role,
+      // })) as User;
       // Inject Logged in user
-      request.user = loggedInUser;
+      // request.user = loggedInUser;
     } catch (error) {
       if (error instanceof TokenExpiredError) {
         throw new UnauthorizedException('Token is expired');

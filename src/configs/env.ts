@@ -24,8 +24,10 @@ export const env = {
     PASSWORD: process.env.ADMIN_PASSWORD,
   },
   SECRETS: {
-    JWT: process.env.SECRETS_JWT,
-    JWT_EXPIRY: Number(process.env.SECRETS_JWT_EXPIRY) ?? 60,
+    JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
+    JWT_ACCESS_EXPIRY: Number(process.env.JWT_ACCESS_EXPIRY) ?? 5, // 5 min
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
+    JWT_REFRESH_EXPIRY: Number(process.env.JWT_REFRESH_EXPIRY) ?? 7, // 7 days
   },
 };
 
@@ -49,8 +51,10 @@ export const configSchema = Joi.object({
     PASSWORD: Joi.string().required(),
   }),
   SECRETS: Joi.object({
-    JWT: Joi.string().required(),
-    JWT_EXPIRY: Joi.number().required(),
+    JWT_ACCESS_SECRET: Joi.string().required(),
+    JWT_ACCESS_EXPIRY: Joi.number().required(),
+    JWT_REFRESH_SECRET: Joi.string().required(),
+    JWT_REFRESH_EXPIRY: Joi.number().required(),
   }),
 });
 
