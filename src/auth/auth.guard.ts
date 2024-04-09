@@ -13,7 +13,7 @@ import { UsersService } from '../users/users.service';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/auth.decorator';
 
-// this is not_used now
+// NOT_USED
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(

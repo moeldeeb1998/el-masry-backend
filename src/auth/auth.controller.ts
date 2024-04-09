@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { SkipAuth } from '../decorators/auth.decorator';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { CustomRequest } from '../types/custom-request';
 import { AccessTokenGuard } from './guards/access-token.guard';
@@ -19,6 +18,7 @@ import { RefreshTokenGuard } from './guards/refresh-token.guard';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  // registation is only available for users not admin
   @HttpCode(HttpStatus.OK)
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
@@ -26,7 +26,6 @@ export class AuthController {
     return;
   }
 
-  @SkipAuth()
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() loginDto: LoginDto) {

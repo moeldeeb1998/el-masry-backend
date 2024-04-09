@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,12 +18,18 @@ import { validateUUID } from '../utils/validator';
 import { UserResource } from './resource/user.resource';
 import { User } from '../models/user.entity';
 import { Response } from 'express';
+import { Roles } from '../decorators/auth.decorator';
+import RoleNames from '../models/enums/RoleNames';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 
 @Controller('api')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('admins')
+  @Roles(RoleNames.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
   async findAllAdmins() {
     const admins = await this.usersService.findAllAdmins();
     return admins.map((admin) => {
