@@ -27,9 +27,9 @@ import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('admins')
   @Roles(RoleNames.ADMIN)
   @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get('admins')
   async findAllAdmins() {
     const admins = await this.usersService.findAllAdmins();
     return admins.map((admin) => {
@@ -37,6 +37,8 @@ export class UsersController {
     });
   }
 
+  @Roles(RoleNames.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
   @Get('admins/:id')
   async findAdmin(@Param('id') id: string) {
     const uuidValidation = validateUUID(id);
@@ -50,6 +52,8 @@ export class UsersController {
     return UserResource.fromUser(admin);
   }
 
+  @Roles(RoleNames.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
   @Post('admins')
   async createAdmin(@Body() createUserDto: CreateUserDto) {
     const createdUser: User =
@@ -58,6 +62,8 @@ export class UsersController {
     return UserResource.fromUser(createdUser);
   }
 
+  @Roles(RoleNames.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
   @Patch('admins/:id')
   async updateAdmin(
     @Res() res: Response,
@@ -73,6 +79,8 @@ export class UsersController {
     return res.status(204).end();
   }
 
+  @Roles(RoleNames.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
   @Delete('admins/:id')
   async removeAdmin(@Res() res: Response, @Param('id') id: string) {
     const uuidValidation = validateUUID(id);
